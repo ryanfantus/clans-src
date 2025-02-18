@@ -139,7 +139,7 @@ struct ResetData ResetData;
 struct config *Config;
 struct game Game = { FALSE, NULL };
 
-char szTodaysDate[11];
+char szTodaysDate[19];
 
 //extern unsigned _stklen = 32U*(1024U);
 
@@ -182,10 +182,10 @@ int main ( void )
   // initialize date
 #ifndef _WIN32
   getdate(&thedate);
-  sprintf(szTodaysDate, "%02d/%02d/%4d", thedate.da_mon, thedate.da_day, thedate.da_year);
+  snprintf(szTodaysDate, sizeof(szTodaysDate), "%02d/%02d/%04d", thedate.da_mon, thedate.da_day, (thedate.da_year < 1000 || thedate.da_year > 9999) ? 1900 : thedate.da_year);
 #else
   GetSystemTime(&system_time);
-  sprintf(szTodaysDate, "%02d/%02d/%4d", system_time.wMonth, system_time.wDay,
+  snprintf(szTodaysDate, sizeof(szTodaysDate), "%02d/%02d/%04d", system_time.wMonth, system_time.wDay,
           system_time.wYear);
 #endif
 
@@ -949,7 +949,7 @@ _INT16 YesNo( char *Query )
 	printf("%s ([Yes]/No) ",Query);
 	fpurge(stdin);
 	fflush(stdout);
-	fgets(answer,128,stdin);
+	if (fgets(answer,128,stdin) == NULL) break;
 	answer[strlen(answer)-1]=0;
 	if (answer[0]=='N' || answer[0]=='n')
 		return (NO);
@@ -983,7 +983,7 @@ _INT16 NoYes( char *Query )
 	printf("%s (Yes/[No])\n",Query);
 	fpurge(stdin);
 	fflush(stdout);
-	fgets(answer,128,stdin);
+	if (fgets(answer,128,stdin) == NULL) break;
 	answer[strlen(answer)-1]=0;
 	if (answer[0]=='Y' || answer[0]=='y')
 		return (YES);
@@ -1265,8 +1265,8 @@ void EditOption ( _INT16 WhichOption )
 			printf("Enter Day: ");
 			scanf("%2d",&Day);
 			printf("Enter Year: ");
-			scanf("%4d",&Year);
-			sprintf(ResetData.szDateGameStart, "%02d/%02d/%4d", Month, Day, Year);
+			scanf("%04d",&Year);
+			snprintf(ResetData.szDateGameStart, sizeof(ResetData.szDateGameStart), "%02d/%02d/%04d", Month, Day, (Year < 1000 || Year > 9999) ? 1900 : Year);
 			break;
 		case 1 :	/* last join date */
 			printf("\n");
@@ -1275,15 +1275,15 @@ void EditOption ( _INT16 WhichOption )
 			printf("Enter Day: ");
 			scanf("%2d",&Day);
 			printf("Enter Year: ");
-			scanf("%4d",&Year);
-			sprintf(ResetData.szLastJoinDate, "%02d/%02d/%4d", Month, Day, Year);
+			scanf("%04d",&Year);
+                        snprintf(ResetData.szLastJoinDate, sizeof(ResetData.szLastJoinDate), "%02d/%02d/%04d", (Month < 1 || Month > 12) ? 1 : Month, (Day < 1 || Day > 31) ? 1 : Day, (Year < 1000 || Year > 9999) ? 1900 : Year);
 			break;
 		case 2 :	/* village name */
 			printf("\n");
 			printf("Please enter the village name: ");
 			fpurge(stdin);
 			fflush(stdout);
-			fgets(ResetData.szVillageName,29,stdin);
+			if (fgets(ResetData.szVillageName,29,stdin) == NULL) break;
 			ResetData.szVillageName[strlen(ResetData.szVillageName)-1]=0;
 			break;
 		case 3 :	/* elimination mode? */
@@ -1385,7 +1385,7 @@ void EditOption ( _INT16 WhichOption )
       Day = (_INT16)DosGetLong("|07Enter Day", atoi(&ResetData.szDateGameStart[3]), 31);
       Year = (_INT16)DosGetLong("|07Enter Year", atoi(&ResetData.szDateGameStart[6]), 2500);
 
-      sprintf(ResetData.szDateGameStart, "%02d/%02d/%4d", Month, Day, Year);
+      snprintf(ResetData.szDateGameStart, sizeof(ResetData.szDateGameStart), "%02d/%02d/%04d", (Month < 1 || Month > 12) ? 1 : Month, (Day < 1 || Day > 31) ? 1 : Day, (Year < 1000 || Year > 9999) ? 1900 : Year);
 			break;
 		case 1 :	/* last join date */
 			gotoxy(1,15);
@@ -1393,7 +1393,7 @@ void EditOption ( _INT16 WhichOption )
       Day = (_INT16)DosGetLong("|07Enter Day", atoi(&ResetData.szLastJoinDate[3]), 31);
       Year = (_INT16)DosGetLong("|07Enter Year", atoi(&ResetData.szLastJoinDate[6]), 2500);
 
-      sprintf(ResetData.szLastJoinDate, "%02d/%02d/%4d", Month, Day, Year);
+      snprintf(ResetData.szLastJoinDate, sizeof(ResetData.szLastJoinDate), "%02d/%02d/%04d", (Month < 1 || Month > 12) ? 1 : Month, (Day < 1 || Day > 31) ? 1 : Day, (Year < 1000 || Year > 9999) ? 1900 : Year);
 			break;
 		case 2 :	/* village name */
 			gotoxy(1,15);
@@ -1514,7 +1514,7 @@ void DosHelp ( char *Topic, char *File )
 		/* read in up to 22 lines */
 		for (CurLine = 0; CurLine < 22; CurLine++)
 		{
-			fgets(Lines[CurLine], 355, fp);
+			if (fgets(Lines[CurLine], 355, fp) == NULL) break;
 
 			if (Lines[CurLine][0] == '^')
 			{
@@ -1588,7 +1588,7 @@ void DosHelp ( char *Topic, char *File )
 		/* read in up to 22 lines */
 		for (CurLine = 0; CurLine < 22; CurLine++)
 		{
-			fgets(Lines[CurLine], 355, fp);
+			if (fgets(Lines[CurLine], 355, fp) == NULL) break;
 
 			if (Lines[CurLine][0] == '^')
 			{
@@ -2330,7 +2330,7 @@ void Config_Init ( void )
 void KillAlliances( void )
 {
 	struct Alliance *Alliances[MAX_ALLIANCES];
-	char szFileName[13];
+	char szFileName[15];
 	_INT16 iTemp;
 
   GetAlliances(Alliances);
@@ -2340,7 +2340,7 @@ void KillAlliances( void )
 	for (iTemp = 0; iTemp < MAX_ALLIANCES; iTemp++)
 		if (Alliances[iTemp])
 		{
-			sprintf(szFileName, "hall%02d.txt", Alliances[iTemp]->ID);
+			snprintf(szFileName, sizeof(szFileName), "hall%02d.txt", Alliances[iTemp]->ID);
 			unlink(szFileName);
 
 			free(Alliances[iTemp]);

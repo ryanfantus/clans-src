@@ -177,9 +177,9 @@ struct PACKED game {
                               // check when entering game against
                               // Config->InterBBS to see if cheating occurs
 
-    char szTodaysDate[11];    // Set to today's date when maintenance run
-    char szDateGameStart[11]; // First day new game begins
-    char szLastJoinDate[11];  // Last day to join game
+    char szTodaysDate[12];    // Set to today's date when maintenance run
+    char szDateGameStart[12]; // First day new game begins
+    char szLastJoinDate[12];  // Last day to join game
 
     _INT16 NextClanID;           // contains next available clanid[1] value
     _INT16 NextAllianceID;       // contains next available alliance ID
