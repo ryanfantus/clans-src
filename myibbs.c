@@ -396,7 +396,8 @@ tIBResult IBSendFileAttach(tIBInfo *pInfo, char *pszDestNode, char *pszFileName)
    if (Config->MailerType == MAIL_BINKLEY)
    {
        MessageHeader.szSubject[0] = '^';    /* delete file when sent */
-       strncpy(&MessageHeader.szSubject[1], szFileNameNoPath, 72);
+       //strncpy(&MessageHeader.szSubject[1], szFileNameNoPath, 72);
+       snprintf(MessageHeader.szSubject, sizeof(MessageHeader.szSubject), "^%s", szFileNameNoPath);
    }
    else
        strncpy(MessageHeader.szSubject, szFileNameNoPath, 72);
