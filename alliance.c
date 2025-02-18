@@ -125,7 +125,9 @@ extern struct clan *PClan;
     // send message to that player
     sprintf(szString, "%s ousted you from %s!", PClan->szName,
       Alliance->szName);
-    GenericMessage(szString, ClanID, PClan->ClanID, PClan->szName, FALSE);
+    _INT16 ClanIDCopy[2];  // Properly aligned local variable
+    memcpy(ClanIDCopy, PClan->ClanID, sizeof(ClanIDCopy));
+    GenericMessage(szString, ClanID, ClanIDCopy, PClan->szName, FALSE);
   }
 
 
@@ -453,8 +455,7 @@ extern struct clan *PClan;
             rputs("Nothing to take!\n");
             break;
           }
-          else
-            DefaultItemIndex = iTemp+1;
+          else DefaultItemIndex = iTemp+1;
 
             ItemIndex = (_INT16) GetLong("|0STake which item from the room? (0=abort)",
               DefaultItemIndex, MAX_ALLIANCEITEMS);
@@ -663,7 +664,7 @@ extern struct clan *PClan;
   BOOL EnterAlliance( struct Alliance *Alliance)
   {
     char *szTheOptions[13], *szString, szName[25];
-    char szFileName[13];
+    char szFileName[15];
     _INT16 iTemp;
 
     // show stats
@@ -720,8 +721,11 @@ extern struct clan *PClan;
           sprintf(szString, "%s left the alliance of %s",
             PClan->szName, Alliance->szName);
 
-          GenericMessage(szString, Alliance->CreatorID,
-            PClan->ClanID, PClan->szName, FALSE);
+          _INT16 ClanIDCopy[2];    // Properly aligned local variable
+          _INT16 CreatorIDCopy[2]; // Properly aligned local variable
+          memcpy(ClanIDCopy, PClan->ClanID, sizeof(ClanIDCopy));
+          memcpy(CreatorIDCopy, Alliance->CreatorID, sizeof(CreatorIDCopy));
+          GenericMessage(szString, CreatorIDCopy, ClanIDCopy, PClan->szName, FALSE);
 
           // done
           free(szString);
@@ -734,7 +738,9 @@ extern struct clan *PClan;
           {
             if (Alliance->Member[iTemp][0] != -1)
             {
-              GetClanNameID(szName, Alliance->Member[iTemp]);
+              _INT16 MemberIDCopy[2];
+              memcpy(MemberIDCopy, Alliance->Member[iTemp], sizeof(MemberIDCopy));
+              GetClanNameID(szName, MemberIDCopy);
               sprintf(szString, "|0A* |0B%s\n", szName);
               rputs(szString);
             }
@@ -765,7 +771,8 @@ extern struct clan *PClan;
             Alliance->CreatorID[1] != PClan->ClanID[1])
           {
             rputs("|0SOnly the creator may change destroy this alliance.\n");
-            if (ClanExists(Alliance->CreatorID) == FALSE)
+            memcpy(CreatorIDCopy, Alliance->CreatorID, sizeof(CreatorIDCopy));
+            if (ClanExists(CreatorIDCopy) == FALSE)
             {
               rputs("|0SAlliance creator was not found, however.  You will be the new creator.\n");
               Alliance->CreatorID[0] = PClan->ClanID[0];
