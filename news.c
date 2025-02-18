@@ -82,7 +82,7 @@ extern struct system System;
       /* get SCREEN_LENGTH-4 lines if possible */
       for (cTemp = 0; cTemp < (od_control.user_screen_length-4); cTemp++)
       {
-        fgets(Lines[cTemp], 255, fp);
+        if (fgets(Lines[cTemp], 255, fp) == NULL) break;
         if (feof(fp))
           break;
       }
