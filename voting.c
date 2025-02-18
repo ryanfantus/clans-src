@@ -241,7 +241,9 @@ extern struct village Village;
 
       if (PClan->ClanRulerVote[0] != -1)
       {
-        GetClanNameID(szName, PClan->ClanRulerVote);
+        _INT16 ClanRulerVoteCopy[2];  // Ensure proper alignment
+        memcpy(ClanRulerVoteCopy, PClan->ClanRulerVote, sizeof(ClanRulerVoteCopy));
+        GetClanNameID(szName, ClanRulerVoteCopy);
       }
       else
         strcpy(szName, "Undecided");
