@@ -145,7 +145,9 @@ extern struct Language *Language;
     CheckMem(TmpClan);
     szString = MakeStr(255);
 
-    GetClan(TradeData->FromClanID, TmpClan);
+    _INT16 FromClanIDCopy[2];  // Properly aligned local variable
+    memcpy(FromClanIDCopy, TradeData->FromClanID, sizeof(FromClanIDCopy));
+    GetClan(FromClanIDCopy, TmpClan);
 
     TmpClan->Empire.VaultGold += TradeData->Giving.Gold;
     TmpClan->Empire.Army.Followers += TradeData->Giving.Followers;
@@ -162,7 +164,12 @@ extern struct Language *Language;
     TradeData->Giving.Catapults = 0L;
 
     sprintf(szString, "%s rejected your trade offer.", PClan->szName);
-    GenericMessage(szString, TradeData->FromClanID, PClan->ClanID, PClan->szName, FALSE);
+
+    _INT16 PClanIDCopy[2];     // Properly aligned local variable
+    memcpy(FromClanIDCopy, TradeData->FromClanID, sizeof(FromClanIDCopy));
+    memcpy(PClanIDCopy, PClan->ClanID, sizeof(PClanIDCopy));
+    GenericMessage(szString, FromClanIDCopy, PClanIDCopy, PClan->szName, FALSE);
+    //GenericMessage(szString, TradeData->FromClanID, PClan->ClanID, PClan->szName, FALSE);
 
     Clan_Update(TmpClan);
 
@@ -297,9 +304,7 @@ extern struct Language *Language;
             (PClan->Empire.Army.Axemen < TradeData.Asking.Axemen) ||
             (PClan->Empire.Army.Knights < TradeData.Asking.Knights))
       {
-        if (YesNo("\n|12You cannot currently accept the trade's requirements.\n\n|0SDo you wish to ignore this for now?")
-            == YES)
-          continue;
+          if (YesNo("\n|12You cannot currently accept the trade's requirements.\n\n|0SDo you wish to ignore this for now?") == YES) continue;
 
           /* doesn't want to ignore it, delete it! */
           RejectTrade(&TradeData);
@@ -334,7 +339,9 @@ extern struct Language *Language;
           TmpClan = malloc(sizeof(struct clan));
           CheckMem(TmpClan);
 
-          GetClan(TradeData.FromClanID, TmpClan);
+          _INT16 FromClanIDCopy[2];  // Properly aligned local variable
+          memcpy(FromClanIDCopy, TradeData.FromClanID, sizeof(FromClanIDCopy));
+          GetClan(FromClanIDCopy, TmpClan);
 
           TmpClan->Empire.VaultGold += TradeData.Asking.Gold;
           TmpClan->Empire.Army.Followers += TradeData.Asking.Followers;
@@ -349,8 +356,11 @@ extern struct Language *Language;
           TradeData.Asking.Axemen, TradeData.Asking.Knights,
           TradeData.Asking.Catapults);
 
-          GenericMessage(szString, TradeData.FromClanID,
-            PClan->ClanID, PClan->szName, FALSE);
+          _INT16 PClanIDCopy[2];  // Properly aligned local variable
+          memcpy(FromClanIDCopy, TradeData.FromClanID, sizeof(FromClanIDCopy));
+          memcpy(PClanIDCopy, PClan->ClanID, sizeof(PClanIDCopy));
+          GenericMessage(szString, FromClanIDCopy,
+            PClanIDCopy, PClan->szName, FALSE);
 
           /* update this data */
           Clan_Update(TmpClan);
