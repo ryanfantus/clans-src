@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef __unix__
 #include "unix_wrappers.h"
 #endif
-//#include <OpenDoor.h>
+//#include "OpenDoor.h"
 #include "structs.h"
 
 #define TRUE                1

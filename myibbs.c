@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 #include "structs.h"
-#include <OpenDoor.h>
+#include "OpenDoor.h"
 #include "interbbs.h"
 #include "video.h"
 

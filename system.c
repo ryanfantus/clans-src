@@ -47,7 +47,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "k_comman.h"
 // #include "tasker.h"
 
-#include <OpenDoor.h>
+#include "OpenDoor.h"
 #include "parsing.h"
 #include "ibbs.h"
 #include "system.h"

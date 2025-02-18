@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <conio.h>
 #endif
 
-#include <OpenDoor.h>
+#include "OpenDoor.h"
 #include "structs.h"
 #include "ibbs.h"
 #include "language.h"

@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "items.h"
 #include "spells.h"
 #include "door.h"
-#include <OpenDoor.h>
+#include "OpenDoor.h"
 #include "help.h"
 #include "input.h"
 

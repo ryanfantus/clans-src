@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Modules
 #include "clans.h"                // functions for this module
 #include "door.h"
-#include <OpenDoor.h>            // opendoors functions
+#include "OpenDoor.h"            // opendoors functions
 #include "system.h"
 #include "language.h"
 #include "mstrings.h"
