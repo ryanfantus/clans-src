@@ -85,8 +85,14 @@ int main ( void )
     char cKey;
     struct clan Clan;
 
-    system("stty raw");
-    system("stty opost onlcr");
+    if (system("stty raw") == -1) {
+        perror("system() failed");
+        exit(1);
+    }
+    if (system("stty opost onlcr") == -1) {
+        perror("system() failed");
+        exit(1);
+    }
     printf(".PC (Player Clans) Editor for The Clans.  v0.10\n");
     printf("\nThis PC editor should only be used on local games and only when\n");
     printf("no one is currently playing.\n\n");
@@ -194,7 +200,9 @@ int main ( void )
 
             printf("Deleting %s\n", Clan.szName);
 
-            DeleteClan(Clan.ClanID);
+            _INT16 ClanIDCopy[2];
+            memcpy(ClanIDCopy, Clan.ClanID, sizeof(ClanIDCopy));
+            DeleteClan(ClanIDCopy);
 
             fpPC = fopen("clans.pc","r+b");
 
@@ -259,7 +267,6 @@ void DeleteClan ( _INT16 ClanID[2])
 	struct TradeData TradeData;
 	struct clan *TmpClan;
 	struct Message Message;
-	BOOL FoundInPCFile = FALSE; 	// set to true if he was ever on this board
 	BOOL FoundNewCreator;
 	struct Alliance *Alliances[MAX_ALLIANCES];
 
@@ -304,7 +311,6 @@ void DeleteClan ( _INT16 ClanID[2])
 			if (TmpClan->ClanID[0] == ClanID[0] &&
 				TmpClan->ClanID[1] == ClanID[1])
 			{
-                FoundInPCFile = TRUE;
 
                 fseek(fpOldPC, Game.Data->MaxPermanentMembers*sizeof(struct pc), SEEK_CUR);
                 continue;
@@ -581,7 +587,9 @@ void RejectTrade ( struct TradeData *TradeData )
     TmpClan = malloc(sizeof(struct clan));
     CheckMem(TmpClan);
 
-    GetClan(TradeData->FromClanID, TmpClan);
+    _INT16 FromClanIDCopy[2];
+    memcpy(FromClanIDCopy, TradeData->FromClanID, sizeof(FromClanIDCopy));
+    GetClan(FromClanIDCopy, TmpClan);
 
     TmpClan->Empire.VaultGold += TradeData->Giving.Gold;
     TmpClan->Empire.Army.Followers += TradeData->Giving.Followers;
@@ -736,7 +744,7 @@ BOOL ClanIDInList( _INT16 ClanID[2] )
 void RemoveFromIPScores ( _INT16 ClanID[2] )
 {
     struct UserScore **ScoreList;
-    _INT16 iTemp, UsersFound = 0;
+    _INT16 iTemp = 0;
     char ScoreDate[11];
     FILE *fp;
 
@@ -776,7 +784,6 @@ void RemoveFromIPScores ( _INT16 ClanID[2] )
             ScoreList[iTemp] = NULL;
         }
     }
-    UsersFound = iTemp;
     fclose(fp);
 
     fp = fopen(IPSCORES_DATAFILE, "wb");

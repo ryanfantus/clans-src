@@ -97,9 +97,6 @@ findfirst(char *pathname, struct ffblk *fblk, int attrib)
 		  strcpy((*fblk).ff_name,strrchr(dp->d_name,'/')+1);
 		else
 		  strcpy((*fblk).ff_name,dp->d_name);
-		if((*fblk).ff_name!=NULL)  {
-		  return(0);
-	  }
     }
 
   closedir(fblk->dir_handle);  
@@ -129,9 +126,6 @@ findnext(struct ffblk *fblk)
 		  strcpy((*fblk).ff_name,strrchr(dp->d_name,'/')+1);
 		else
 		  strcpy((*fblk).ff_name,dp->d_name);
-		if((*fblk).ff_name!=NULL)  {
-		  return(0);
-	  }
     }
   
   closedir(fblk->dir_handle);  
