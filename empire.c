@@ -700,7 +700,7 @@ extern struct ibbs IBBS;
       if (Empire->Buildings[iTemp])
       {
         ShowedOne = TRUE;
-        sprintf(szString, "  %d %s\n", Empire->Buildings[iTemp],
+        snprintf(szString, sizeof(szString), "  %d %%s\n", Empire->Buildings[iTemp],
           BuildingType[iTemp].szName);
         rputs(szString);
       }
@@ -765,7 +765,7 @@ extern struct ibbs IBBS;
     char *szTheOptions[15];
     char szString[128], szFileName[30];
     long LimitingVariable, NumToDonate;
-    BOOL IsRuler;
+    //BOOL IsRuler;
 
     LoadStrings(1450, 15, szTheOptions);
 
@@ -781,8 +781,8 @@ extern struct ibbs IBBS;
       rputs(" |0BDonation\n");
       rputs(ST_LONGLINE);
 
-      IsRuler = PClan->ClanID[0] == Village.Data->RulingClanId[0] &&
-        PClan->ClanID[1] == Village.Data->RulingClanId[1];
+      //IsRuler = PClan->ClanID[0] == Village.Data->RulingClanId[0] &&
+      //  PClan->ClanID[1] == Village.Data->RulingClanId[1];
 
       // show empire stats
   /*
@@ -1665,6 +1665,7 @@ extern struct ibbs IBBS;
     _INT16 Goal, _INT16 ExtentOfAttack)
   {
     struct Army DefendingArmy, ArmyKilledByTowers, ArmyStoppedByWalls;
+    memset(&DefendingArmy, 0, sizeof(DefendingArmy));  // Safe initialization
     _INT16 iTemp;
 
     // ExtentOfAttack is used for stealing land, gold, and destroying
@@ -1818,7 +1819,7 @@ extern struct ibbs IBBS;
   void ProcessAttackResult ( struct AttackResult *AttackResult )
   {
     char szNews[128], *szMessage, szString[255],
-    szDefenderType[40], szAttacker[40], szDefender[40];
+    szDefenderType[40], szAttacker[100], szDefender[100];
     _INT16 WhichBBS = 0, iTemp, Junk[2];  // <<-- Junk[] is used as dummy
     _INT16 Percent, WhichAlliance, LandGained;
     struct clan *TmpClan;
@@ -1854,7 +1855,7 @@ extern struct ibbs IBBS;
       if (AttackResult->AttackerType == EO_VILLAGE)
         sprintf(szAttacker, "The village of %s", AttackResult->szAttackerName);
       else if (AttackResult->AttackerType == EO_CLAN)
-        sprintf(szAttacker, "The clan of %s from %s", AttackResult->szAttackerName,
+        snprintf(szAttacker, sizeof(szAttacker), "The clan of %s from %s", AttackResult->szAttackerName,
           IBBS.Data->Nodes[WhichBBS-1].Info.pszVillageName);
     }
     else
@@ -1864,7 +1865,7 @@ extern struct ibbs IBBS;
       else if (AttackResult->AttackerType == EO_CLAN)
         sprintf(szAttacker, "%s", AttackResult->szAttackerName);
       else if (AttackResult->AttackerType == EO_ALLIANCE)
-         sprintf(szAttacker, "The alliance of %s", AttackResult->szAttackerName);
+         snprintf(szAttacker, sizeof(szAttacker), "The alliance of %s", AttackResult->szAttackerName);
     }
     switch (AttackResult->DefenderType)
     {
@@ -1884,7 +1885,7 @@ extern struct ibbs IBBS;
             break;
         }
         WhichAlliance = iTemp;
-        sprintf(szDefender, "the alliance of %s", Alliances[iTemp]->szName);
+        snprintf(szDefender, sizeof(szDefender), "the alliance of %s", Alliances[iTemp]->szName);
 
         // free up mem used by alliances
         for (iTemp = 0; iTemp < MAX_ALLIANCES; iTemp++)
@@ -2161,7 +2162,7 @@ extern struct ibbs IBBS;
 
     // figure out how much mem this takes
     CurChar = 0;
-    for (CurType = 0; CurType < NUM_BUILDINGTYPES; CurType++)
+    for (CurType = 0; CurType < NUM_BUILDINGTYPES; CurType++) {
       for (CurBuilding = 0; CurBuilding < NumBuildings[CurType]; CurBuilding++)
       {
         // fill up with junk
@@ -2175,6 +2176,7 @@ extern struct ibbs IBBS;
           return;
       }
 
+    }
     WarZone = malloc(CurChar);
     CheckMem(WarZone);
 
@@ -2310,7 +2312,8 @@ extern struct ibbs IBBS;
             sprintf(szString, ST_WRESULTS5, Result->GoldStolen);
           else
             // od_printf("You couldn't find any gold!\n\r");
-            sprintf(szString, ST_WRESULTS6);
+            //sprintf(szString, ST_WRESULTS6);
+            snprintf(szString, sizeof(szString), "%s", ST_WRESULTS6);
           rputs(szString);
           break;
         case G_STEALLAND :
@@ -2319,7 +2322,8 @@ extern struct ibbs IBBS;
             sprintf(szString, ST_WRESULTS7, Result->LandStolen);
           else
             // od_printf("You couldn't steal any land!\n\r");
-            sprintf(szString, ST_WRESULTS8);
+            //sprintf(szString, ST_WRESULTS8);
+            snprintf(szString, sizeof(szString), "%s", ST_WRESULTS8);
           rputs(szString);
 
           // what destroyed
@@ -3133,7 +3137,7 @@ extern struct ibbs IBBS;
        *pszClan = "3 A Clan",
        *aszVillageNames[MAX_IBBSNODES],
        *pszWhoToSpy[3],
-       *aszAllianceNames[MAX_ALLIANCES], szSpierName[40], szMessage[128];
+       *aszAllianceNames[MAX_ALLIANCES], szSpierName[100], szMessage[128];
     _INT16 NumOfTypes, iTemp, NumBBSes, BBSIndex[MAX_IBBSNODES];
     _INT16 WhichVillage, NumAlliances, WhichAlliance, TypeToSpyOn;
     char szString[255];
@@ -3158,7 +3162,7 @@ extern struct ibbs IBBS;
     else if (Empire->OwnerType == EO_CLAN)
       sprintf(szSpierName, "%s", Empire->szName);
     else if (Empire->OwnerType == EO_ALLIANCE)
-      sprintf(szSpierName, "the alliance of %s", Empire->szName);
+      snprintf(szSpierName, sizeof(szSpierName), "the alliance of %s", Empire->szName);
 
     // choose who to spy on:
     if (Game.Data->ClanEmpires == FALSE)
